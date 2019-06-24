@@ -37,7 +37,7 @@ type Item struct {
 	Elder                 bool                `json:"elder"`
 	EnchantMods           []string            `json:"enchantMods"`
 	ExplicitMods          []string            `json:"explicitMods"`
-	FlavourText           string              `json:"flavourText"`
+	FlavourText           []string            `json:"flavourText"`
 	FrameType             FrameType           `json:"frameType"`
 	Height                int                 `json:"h"`
 	Icon                  string              `json:"icon"`
@@ -59,8 +59,8 @@ type Item struct {
 	Requirements          []Properties        `json:"requirements"`
 	SecDescriptionText    string              `json:"secDescrText"`
 	Shaper                bool                `json:"shaper"`
-	SocketedItems         string              `json:"socketedItems"`
-	Sockets               Sockets             `json:"sockets"`
+	SocketedItems         []Item              `json:"socketedItems"`
+	Sockets               []SocketGroup       `json:"sockets"`
 	StackSize             int                 `json:"stackSize"`
 	Support               bool                `json:"support"`
 	TalismanTier          int                 `json:"talismanTier"`
