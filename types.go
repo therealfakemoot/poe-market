@@ -100,7 +100,7 @@ type RequirementsValues struct {
 	ValueType ValueType
 }
 
-func (rv *RequirementsValues) Unmarshal(data []byte) error {
+func (rv *RequirementsValues) UnmarshalJSON(data []byte) error {
 	tmp := []interface{}{&rv.Value, &rv.ValueType}
 	return json.Unmarshal(data, &tmp)
 }
