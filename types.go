@@ -33,7 +33,7 @@ type Item struct {
 	CosmeticMods          []string            `json:"cosmeticMods"`
 	CraftedMods           []string            `json:"craftedMods"`
 	DescrText             string              `json:"descrText"`
-	Duplicated            string              `json:"duplicated"`
+	Duplicated            bool                `json:"duplicated"`
 	Elder                 bool                `json:"elder"`
 	EnchantMods           []string            `json:"enchantMods"`
 	ExplicitMods          []string            `json:"explicitMods"`
@@ -49,7 +49,7 @@ type Item struct {
 	IsRelic               bool                `json:"isRelic"`
 	League                string              `json:"league"`
 	LockedToCharacter     bool                `json:"lockedToCharacter"`
-	MaxStackSize          bool                `json:"maxStackSize"`
+	MaxStackSize          int                 `json:"maxStackSize"`
 	Name                  string              `json:"name"`
 	NextLevelRequirements []Properties        `json:"nextLevelRequirements"`
 	Note                  string              `json:"note"`

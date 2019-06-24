@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestEnvelopeDecode(t *testing.T) {
+	f, err := os.Open("example/envelope.json")
+
+	defer f.Close()
+
+	if err != nil {
+		t.Logf("could not open test data: %s", err)
+		t.Fail()
+	}
+
+	var e Envelope
+
+	d := json.NewDecoder(f)
+	err = d.Decode(&e)
+	if err != nil {
+		t.Logf("error parsing envelope: %s", err)
+		t.Fail()
+	}
+}
+
 func TestItemDecode(t *testing.T) {
 	types := []string{"ring", "gem", "sword"}
 	for _, itemType := range types {
