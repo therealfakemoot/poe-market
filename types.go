@@ -78,6 +78,19 @@ type SocketAttr struct {
 }
 
 func (sa *SocketAttr) UnmarshalJSON(data []byte) error {
+	var val interface{}
+
+	err := json.Unmarshal(data, &val)
+	if err != nil {
+		return err
+	}
+
+	switch val.(type) {
+	case string:
+		sa.Type = val.(string)
+	case bool:
+		sa.Abyss = val.(bool)
+	}
 	return nil
 }
 
@@ -87,6 +100,19 @@ type SocketColour struct {
 }
 
 func (sc *SocketColour) UnmarshalJSON(data []byte) error {
+	var val interface{}
+
+	err := json.Unmarshal(data, &val)
+	if err != nil {
+		return err
+	}
+
+	switch val.(type) {
+	case string:
+		sc.Colour = val.(string)
+	case bool:
+		sc.Abyss = val.(bool)
+	}
 	return nil
 }
 
