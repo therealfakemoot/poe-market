@@ -28,12 +28,10 @@ func TestItemDecode(t *testing.T) {
 func TestRequirementsDecode(t *testing.T) {
 	t.Run("simple properties", func(t *testing.T) {
 		in := `[{"name":"Level","values":[["33",0]],"displayMode":0}]`
-
-		var r []Properties
-
-		err := json.Unmarshal([]byte(in), &r)
+		var ps []Properties
+		err := json.Unmarshal([]byte(in), &ps)
 		if err != nil {
-			t.Logf("unmarshal error: %s", err)
+			t.Logf("could not decode properties: %s", err)
 			t.Fail()
 		}
 	})
