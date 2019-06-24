@@ -79,7 +79,7 @@ type Properties struct {
 	Values      []RequirementsValues `json:"values"`
 	DisplayMode int                  `json:"displayMode"`
 	Type        int                  `json:"type,omitempty"`
-	Progress    int                  `json:"progress,omitempty"`
+	Progress    float64              `json:"progress,omitempty"`
 }
 
 type ValueType int
