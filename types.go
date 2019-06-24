@@ -26,7 +26,7 @@ type Stash struct {
 // Item describes the attributes of inventory items.
 type Item struct {
 	AbyssJewel            bool                `json:"abyssJewel"`
-	AdditionalProperties  Properties          `json:"additionalProperties"`
+	AdditionalProperties  []Properties        `json:"additionalProperties"`
 	ArtFilename           string              `json:"artFilename"`
 	Category              map[string][]string `json:"category"`
 	Corrupted             bool                `json:"corrupted"`
@@ -51,9 +51,9 @@ type Item struct {
 	LockedToCharacter     bool                `json:"lockedToCharacter"`
 	MaxStackSize          bool                `json:"maxStackSize"`
 	Name                  string              `json:"name"`
-	NextLevelRequirements Properties          `json:"nextLevelRequirements"`
+	NextLevelRequirements []Properties        `json:"nextLevelRequirements"`
 	Note                  string              `json:"note"`
-	Properties            Properties          `json:"properties"`
+	Properties            []Properties        `json:"properties"`
 	ProphecyDiffText      string              `json:"prophecyDiffText"`
 	ProphecyText          string              `json:"prophecyText"`
 	Requirements          []Properties        `json:"requirements"`
