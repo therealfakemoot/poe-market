@@ -12,7 +12,9 @@ func main() {
 		live  bool
 	)
 	flag.StringVar(&input, "file", "tabs.json", "input file")
-	flag.BoolVar(&live, "api", false, "use ")
+	flag.BoolVar(&live, "api", false, "use live api data")
+
+	flag.Parse()
 
 	if !live {
 		return
