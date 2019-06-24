@@ -72,7 +72,29 @@ type Item struct {
 	Y                     int                 `json:"y"`
 }
 
-type Sockets struct{}
+type SocketAttr struct {
+	Type  string
+	Abyss bool
+}
+
+func (sa *SocketAttr) UnmarshalJSON(data []byte) error {
+	return nil
+}
+
+type SocketColour struct {
+	Colour string
+	Abyss  bool
+}
+
+func (sc *SocketColour) UnmarshalJSON(data []byte) error {
+	return nil
+}
+
+type SocketGroup struct {
+	Group   int
+	Attr    SocketAttr
+	SColour string
+}
 
 type Properties struct {
 	Name        string               `json:"name"`
