@@ -56,7 +56,7 @@ type Item struct {
 	Properties            Properties          `json:"properties"`
 	ProphecyDiffText      string              `json:"prophecyDiffText"`
 	ProphecyText          string              `json:"prophecyText"`
-	Requirements          Properties          `json:"requirements"`
+	Requirements          []Properties        `json:"requirements"`
 	SecDescriptionText    string              `json:"secDescrText"`
 	Shaper                bool                `json:"shaper"`
 	SocketedItems         string              `json:"socketedItems"`
