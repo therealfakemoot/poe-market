@@ -23,6 +23,7 @@ func TestItemDecode(t *testing.T) {
 
 			err = d.Decode(&item)
 			if err != nil {
+				t.Logf("%#v", item)
 				t.Logf("unmarshal error: %s", err)
 				t.Fail()
 			}
