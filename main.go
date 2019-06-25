@@ -3,10 +3,32 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 )
+
+func LoadFile(filename string) (Envelope, error) {
+	var e Envelope
+
+	f, err := os.Open(filename)
+	defer f.Close()
+
+	if err != nil {
+		return e, err
+	}
+
+	d := json.NewDecoder(f)
+	err = d.Decode(&e)
+
+	if err != nil {
+		return e, err
+	}
+
+	log.Printf("Next page ID: %s", e.NextChangeID)
+
+	return e, nil
+
+}
 
 func main() {
 	var (
@@ -17,28 +39,24 @@ func main() {
 	flag.BoolVar(&live, "api", false, "use live api data")
 
 	flag.Parse()
+	var (
+		e   Envelope
+		err error
+	)
 
 	if !live {
-		f, err := os.Open(input)
-		defer f.Close()
-
+		e, err = LoadFile(input)
 		if err != nil {
-			log.Fatalf(`Unable to open "%s": %s`, input, err)
+			log.Fatalf("error loading file: %s", err)
 		}
-
-		var e Envelope
-
-		d := json.NewDecoder(f)
-		err = d.Decode(&e)
-
-		if err != nil {
-			log.Fatalf(`Unable to decode payload: %s`, err)
-		}
-
-		log.Printf("Next page ID: %s", e.NextChangeID)
-
-		return
+		log.Printf("Loading %s as datasource\n", input)
 	}
 
-	fmt.Printf("Loading %s as datasource\n", input)
+	e, err = FetchStashes("")
+	if err != nil {
+		log.Fatalf("error fetching API data: %s", err)
+	}
+
+	log.Printf("next-change-id: %s", e.NextChangeID)
+	log.Printf("stash count: %d", len(e.Stashes))
 }
