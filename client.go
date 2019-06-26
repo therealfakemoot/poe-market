@@ -75,7 +75,7 @@ func (sa *StashStream) Start(ctx context.Context) error {
 			log.Printf("error decoding envelope: %s", err)
 			continue
 		}
-
+		log.Printf("next page ID: %s", e.NextChangeID)
 		sa.NextID = e.NextChangeID
 
 		for _, stash := range e.Stashes {
