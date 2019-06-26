@@ -63,7 +63,7 @@ func (sa *StashStream) Start(ctx context.Context) error {
 			log.Printf("error requesting page: %s", err)
 			continue
 		}
-		resp.Body.Close()
+		defer resp.Body.Close()
 
 		d := json.NewDecoder(resp.Body)
 		err = d.Decode(&e)
