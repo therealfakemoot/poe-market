@@ -78,13 +78,10 @@ func (sa *StashStream) Start(ctx context.Context) error {
 
 		sa.NextID = e.NextChangeID
 
-		go func() {
+		for _, stash := range e.Stashes {
+			sa.Stashes <- stash
+		}
 
-			for _, stash := range e.Stashes {
-				sa.Stashes <- stash
-			}
-
-		}()
 		select {
 		case <-ctx.Done():
 			return err

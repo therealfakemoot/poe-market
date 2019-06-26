@@ -6,6 +6,8 @@ import (
 	"flag"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -41,9 +43,6 @@ func main() {
 	flag.StringVar(&file, "file", "stash-data.db", "database file")
 
 	flag.Parse()
-	var (
-		err error
-	)
 
 	APILimit := rate.Limit(1.0)
 	l := rate.NewLimiter(APILimit, 1)
@@ -56,11 +55,15 @@ func main() {
 	log.Println("starting stream")
 	go stream.Start(ctx)
 	var count int
-	for _ = range stream.Stashes {
-		count++
-		log.Printf("%d total stashes received", count)
-	}
-	if err != nil {
-		log.Fatalf("error fetching API data: %s", err)
-	}
+	go func() {
+		for range stream.Stashes {
+			count++
+			log.Printf("%d total stashes received", count)
+		}
+	}()
+
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+
 }
