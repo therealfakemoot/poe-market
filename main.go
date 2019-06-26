@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"log"
 	"os"
+	"time"
+
+	"golang.org/x/time/rate"
 )
 
 func LoadFile(filename string) (Envelope, error) {
@@ -32,31 +36,31 @@ func LoadFile(filename string) (Envelope, error) {
 
 func main() {
 	var (
-		input string
-		live  bool
+		file string
 	)
-	flag.StringVar(&input, "file", "tabs.json", "input file")
-	flag.BoolVar(&live, "api", false, "use live api data")
+	flag.StringVar(&file, "file", "stash-data.db", "database file")
 
 	flag.Parse()
 	var (
-		e   Envelope
 		err error
 	)
 
-	if !live {
-		e, err = LoadFile(input)
-		if err != nil {
-			log.Fatalf("error loading file: %s", err)
-		}
-		log.Printf("Loading %s as datasource\n", input)
-	}
+	APILimit := rate.Limit(1.0)
+	l := rate.NewLimiter(APILimit, 1)
 
-	e, err = FetchStashes("")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	stream := New(l)
+
+	log.Println("starting stream")
+	go stream.Start(ctx)
+	var count int
+	for _ = range stream.Stashes {
+		count++
+		log.Printf("%d total stashes received", count)
+	}
 	if err != nil {
 		log.Fatalf("error fetching API data: %s", err)
 	}
-
-	log.Printf("next-change-id: %s", e.NextChangeID)
-	log.Printf("stash count: %d", len(e.Stashes))
 }

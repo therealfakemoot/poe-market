@@ -1,13 +1,41 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"golang.org/x/time/rate"
+	"log"
 	"net/http"
 	"net/url"
 )
 
-func FetchStashes(id string) (Envelope, error) {
-	var e Envelope
+type StreamError struct {
+	PageID string
+	Err    error
+}
+
+func (se StreamError) Error() string {
+	return fmt.Sprintf(`unable to fetch page "%s": %s`, se.PageID, se.Err)
+}
+
+func New(l *rate.Limiter) StashStream {
+	var sa StashStream
+	sa.Limiter = l
+	sa.Stashes = make(chan Stash, 5)
+	sa.Err = make(chan error)
+	return sa
+}
+
+type StashStream struct {
+	Limiter *rate.Limiter
+	NextID  string
+	Stashes chan Stash
+	Err     chan error
+}
+
+func (sa *StashStream) Start(ctx context.Context) error {
+	sa.Limiter.Wait(ctx)
 
 	BASE := url.URL{
 		Scheme: "http",
@@ -17,24 +45,50 @@ func FetchStashes(id string) (Envelope, error) {
 
 	c := &http.Client{}
 
-	v := url.Values{}
-	if id != "" {
-		v.Set("id", id)
+	var e Envelope
+
+	for {
+		log.Printf(`requesting page "%s"`, sa.NextID)
+		v := url.Values{}
+		v.Set("id", sa.NextID)
+		BASE.RawQuery = v.Encode()
+
+		resp, err := c.Get(BASE.String())
+
+		if err != nil {
+			sa.Err <- StreamError{
+				PageID: sa.NextID,
+				Err:    err,
+			}
+			log.Printf("error requesting page: %s", err)
+			continue
+		}
+		resp.Body.Close()
+
+		d := json.NewDecoder(resp.Body)
+		err = d.Decode(&e)
+		if err != nil {
+			sa.Err <- StreamError{
+				PageID: sa.NextID,
+				Err:    err,
+			}
+			log.Printf("error decoding envelope: %s", err)
+			continue
+		}
+
+		sa.NextID = e.NextChangeID
+
+		go func() {
+
+			for _, stash := range e.Stashes {
+				sa.Stashes <- stash
+			}
+
+		}()
+		select {
+		case <-ctx.Done():
+			return err
+		}
+
 	}
-	BASE.RawQuery = v.Encode()
-
-	resp, err := c.Get(BASE.String())
-
-	if err != nil {
-		return e, err
-	}
-	defer resp.Body.Close()
-
-	d := json.NewDecoder(resp.Body)
-	err = d.Decode(&e)
-	if err != nil {
-		return e, err
-	}
-
-	return e, nil
 }
