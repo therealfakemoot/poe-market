@@ -34,7 +34,7 @@ type StashStream struct {
 	Err     chan error
 }
 
-func (sa *StashStream) Start(ctx context.Context) error {
+func (sa *StashStream) Start(ctx context.Context) {
 	sa.Limiter.Wait(ctx)
 
 	BASE := url.URL{
@@ -81,11 +81,5 @@ func (sa *StashStream) Start(ctx context.Context) error {
 		for _, stash := range e.Stashes {
 			sa.Stashes <- stash
 		}
-
-		select {
-		case <-ctx.Done():
-			return err
-		}
-
 	}
 }
