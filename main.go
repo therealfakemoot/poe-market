@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
 )
@@ -56,11 +57,19 @@ func main() {
 
 	log.Println("starting stream")
 	go stream.Start(ctx)
-	var count int
+
+	gauges := make(map[string]prometheus.Gauge)
+
 	go func() {
-		for range stream.Stashes {
-			count++
-			log.Printf("%d total stashes received", count)
+		for stash := range stream.Stashes {
+			for _, item := range stash.Items {
+				_, ok := gauges[item.TypeLine]
+				if !ok {
+					gauges[item.TypeLine] = NewGauge(item)
+					prometheus.MustRegister(gauges[item.TypeLine])
+					log.Printf("Registered gauge for %s", item.TypeLine)
+				}
+			}
 		}
 	}()
 

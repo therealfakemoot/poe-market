@@ -1,0 +1,27 @@
+package main
+
+import (
+	"log"
+	"strings"
+
+	"github.com/prometheus/client_golang/prometheus"
+	U "github.com/therealfakemoot/go-unidecode"
+)
+
+func SanitizeName(name string) string {
+	s := U.Unidecode(strings.ReplaceAll(name, `"`, ""))
+	s = strings.ReplaceAll(s, `'`, "")
+	s = strings.ReplaceAll(s, `-`, "_")
+	s = strings.ReplaceAll(s, ` `, "_")
+
+	return s
+}
+
+func NewGauge(i Item) prometheus.Gauge {
+	sanitized := SanitizeName(i.TypeLine)
+	log.Printf("sanitized name: %s", sanitized)
+	return prometheus.NewGauge(prometheus.GaugeOpts{
+		Namespace: "market",
+		Name:      sanitized,
+	})
+}
