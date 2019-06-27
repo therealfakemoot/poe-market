@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
 )
 
@@ -44,7 +46,7 @@ func main() {
 
 	flag.Parse()
 
-	APILimit := rate.Limit(1.0)
+	APILimit := rate.Limit(2.0)
 	l := rate.NewLimiter(APILimit, 1)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
@@ -61,6 +63,9 @@ func main() {
 			log.Printf("%d total stashes received", count)
 		}
 	}()
+
+	http.Handle("/metrics", promhttp.Handler())
+	go http.ListenAndServe("0.0.0.0:9092", nil)
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
