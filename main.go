@@ -62,12 +62,16 @@ func main() {
 
 	go func() {
 		for stash := range stream.Stashes {
-			for _, item := range stash.Items {
-				_, ok := gauges[item.TypeLine]
-				if !ok {
-					gauges[item.TypeLine] = NewGauge(item)
-					prometheus.MustRegister(gauges[item.TypeLine])
-					log.Printf("Registered gauge for %s", item.TypeLine)
+			if stash.Public {
+				for _, item := range stash.Items {
+					if item.Note != "" {
+						_, ok := gauges[item.TypeLine]
+						if !ok {
+							gauges[item.TypeLine] = NewGauge(item)
+							prometheus.MustRegister(gauges[item.TypeLine])
+							// log.Printf("Registered gauge for %s", item.TypeLine)
+						}
+					}
 				}
 			}
 		}
