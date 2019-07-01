@@ -14,8 +14,9 @@ func SanitizeName(name string) string {
 	s = strings.ReplaceAll(s, `,`, "")
 	s = strings.ReplaceAll(s, `-`, "_")
 	s = strings.ReplaceAll(s, ` `, "_")
+	s = s + "_price_chaos"
 
-	return s
+	return strings.ToLower(s)
 }
 
 func NewGauge(i Item) prometheus.Gauge {
