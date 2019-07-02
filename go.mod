@@ -9,5 +9,5 @@ require (
 	github.com/therealfakemoot/go-unidecode v0.1.2
 	golang.org/x/arch v0.0.0-20190312162104-788fe5ffcd8c // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
-	golang.org/x/tools v0.0.0-20190701194522-38ae2c8f6412 // indirect
+	golang.org/x/tools v0.0.0-20190702152245-7e72c71c505f // indirect
 )
