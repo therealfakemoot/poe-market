@@ -1,4 +1,4 @@
-package pom
+package poe
 
 import (
 	"encoding/json"

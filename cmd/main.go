@@ -16,10 +16,11 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/therealfakemoot/pom"
+	"github.com/therealfakemoot/pom/poe"
 )
 
-func LoadFile(filename string) (pom.Envelope, error) {
-	var e pom.Envelope
+func LoadFile(filename string) (poe.Envelope, error) {
+	var e poe.Envelope
 
 	f, err := os.Open(filename)
 	defer f.Close()
@@ -55,7 +56,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	stream := pom.New(l)
+	stream := poe.New(l)
 
 	log.Println("starting stream")
 	go stream.Start(ctx)

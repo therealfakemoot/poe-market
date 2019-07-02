@@ -5,6 +5,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	U "github.com/therealfakemoot/go-unidecode"
+
+	"github.com/therealfakemoot/pom/poe"
 )
 
 func SanitizeName(name string) string {
@@ -18,7 +20,7 @@ func SanitizeName(name string) string {
 	return strings.ToLower(s)
 }
 
-func NewGauge(i Item) prometheus.Gauge {
+func NewGauge(i poe.Item) prometheus.Gauge {
 	sanitized := SanitizeName(i.TypeLine)
 	return prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: "market",
@@ -30,7 +32,7 @@ type GaugeSet struct {
 	Gauges map[string]prometheus.Gauge
 }
 
-func (gs GaugeSet) RegisterItem(i Item) {
+func (gs GaugeSet) RegisterItem(i poe.Item) {
 
 	if i.Note != "" {
 		_, ok := gs.Gauges[i.TypeLine]
