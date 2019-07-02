@@ -4,7 +4,11 @@ services:
     build:
       context: .
       dockerfile: prom-dockerfile
+    ports:
+      - "9090:9091"
   poe:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "9092:9092"
