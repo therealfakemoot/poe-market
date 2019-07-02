@@ -1,7 +1,6 @@
 package pom
 
 import (
-	// "log"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,4 +24,19 @@ func NewGauge(i Item) prometheus.Gauge {
 		Namespace: "market",
 		Name:      sanitized,
 	})
+}
+
+type GaugeSet struct {
+	Gauges map[string]prometheus.Gauge
+}
+
+func (gs GaugeSet) RegisterItem(i Item) {
+
+	if i.Note != "" {
+		_, ok := gs.Gauges[i.TypeLine]
+		if !ok {
+			gs.Gauges[i.TypeLine] = NewGauge(i)
+			prometheus.MustRegister(gs.Gauges[i.TypeLine])
+		}
+	}
 }

@@ -60,20 +60,14 @@ func main() {
 	log.Println("starting stream")
 	go stream.Start(ctx)
 
-	gauges := make(map[string]prometheus.Gauge)
+	var gs pom.GaugeSet
+	gs.Gauges = make(map[string]prometheus.Gauge)
 
 	go func() {
 		for stash := range stream.Stashes {
 			if stash.Public {
 				for _, item := range stash.Items {
-					if item.Note != "" {
-						_, ok := gauges[item.TypeLine]
-						if !ok {
-							gauges[item.TypeLine] = pom.NewGauge(item)
-							prometheus.MustRegister(gauges[item.TypeLine])
-							// log.Printf("Registered gauge for %s", item.TypeLine)
-						}
-					}
+					gs.RegisterItem(item)
 				}
 			}
 		}
