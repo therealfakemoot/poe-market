@@ -14,10 +14,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
+
+	"github.com/therealfakemoot/pom"
 )
 
-func LoadFile(filename string) (Envelope, error) {
-	var e Envelope
+func LoadFile(filename string) (pom.Envelope, error) {
+	var e pom.Envelope
 
 	f, err := os.Open(filename)
 	defer f.Close()
@@ -53,7 +55,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	stream := New(l)
+	stream := pom.New(l)
 
 	log.Println("starting stream")
 	go stream.Start(ctx)
@@ -67,7 +69,7 @@ func main() {
 					if item.Note != "" {
 						_, ok := gauges[item.TypeLine]
 						if !ok {
-							gauges[item.TypeLine] = NewGauge(item)
+							gauges[item.TypeLine] = pom.NewGauge(item)
 							prometheus.MustRegister(gauges[item.TypeLine])
 							// log.Printf("Registered gauge for %s", item.TypeLine)
 						}
