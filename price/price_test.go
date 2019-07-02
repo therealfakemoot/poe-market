@@ -1,31 +1,11 @@
-package pom
+package price
 
 import (
-	"strconv"
 	"testing"
 )
 
-type DummyPriceDB struct {
-	priceMap map[string]float64
-}
-
-func (db DummyPriceDB) Convert(q string, t string) (float64, error) {
-
-	c, ok := db.priceMap[t]
-	if !ok {
-		return 0.0, ErrUnrecognizedCurrency
-	}
-
-	v, err := strconv.ParseFloat(q, 64)
-	if err != nil {
-		return 0.0, ErrInvalidCurrencyQuantity
-	}
-
-	return c * v, nil
-}
-
 func Test_ParsePrice(t *testing.T) {
-	var db DummyPriceDB
+	var db MapPriceDB
 	db.priceMap = make(map[string]float64)
 	db.priceMap["chaos"] = 1.0
 	db.priceMap["exa"] = 100.0
