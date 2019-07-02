@@ -1,0 +1,10 @@
+version: '3'
+services:
+  prometheus:
+    build:
+      context: .
+      dockerfile: prom-dockerfile
+  poe:
+    build:
+      context: .
+      dockerfile: Dockerfile
