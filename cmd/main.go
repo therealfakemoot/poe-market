@@ -15,7 +15,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
 
-	"github.com/therealfakemoot/pom"
+	"github.com/therealfakemoot/pom/metrics"
 	"github.com/therealfakemoot/pom/poe"
 )
 
@@ -61,7 +61,7 @@ func main() {
 	log.Println("starting stream")
 	go stream.Start(ctx)
 
-	var gs pom.GaugeSet
+	var gs metrics.GaugeSet
 	gs.Gauges = make(map[string]prometheus.Gauge)
 
 	go func() {

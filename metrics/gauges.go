@@ -1,4 +1,4 @@
-package gauges
+package metrics
 
 import (
 	"strings"
