@@ -1,4 +1,4 @@
-package pom
+package gauges
 
 import (
 	"strings"
