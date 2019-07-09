@@ -119,8 +119,14 @@ func (i Item) Key() GaugeKey {
 }
 
 func (i Item) Labels() prometheus.Labels {
+	var name = i.Name
+
+	if i.Name == "" {
+		name = i.TypeLine
+	}
+
 	return prometheus.Labels{
-		"name":      i.Name,
+		"name":      name,
 		"sockets":   fmt.Sprintf("%d", len(i.Sockets)),
 		"links":     fmt.Sprintf("%d", i.SocketLinks()),
 		"frametype": i.FrameType.String(),
