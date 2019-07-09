@@ -2,7 +2,18 @@ package poe
 
 import (
 	"encoding/json"
+	"fmt"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+// GaugeKey is used to identify an item in the context of a metrics.GaugeSet. Had to move it here to prevent an import cycle.
+type GaugeKey struct {
+	Name      string
+	Sockets   int
+	Links     int
+	FrameType string
+}
 
 // Envelope is the payload envelope containing the pagination ID and
 // the actual Stash Tab data.
@@ -70,6 +81,50 @@ type Item struct {
 	Width                 int                 `json:"w"`
 	X                     int                 `json:"x"`
 	Y                     int                 `json:"y"`
+}
+
+func (i Item) SocketLinks() int {
+	var (
+		max int
+	)
+
+	groups := make(map[int]int)
+
+	for _, s := range i.Sockets {
+		groups[s.Group]++
+	}
+
+	for _, c := range groups {
+		if max < c {
+			max = c
+		}
+	}
+
+	return max
+}
+
+func (i Item) Key() GaugeKey {
+	var name = i.Name
+
+	if i.Name == "" {
+		name = i.TypeLine
+	}
+
+	return GaugeKey{
+		Name:      name,
+		Sockets:   len(i.Sockets),
+		Links:     i.SocketLinks(),
+		FrameType: i.FrameType.String(),
+	}
+}
+
+func (i Item) Labels() prometheus.Labels {
+	return prometheus.Labels{
+		"name":      i.Name,
+		"sockets":   fmt.Sprintf("%d", len(i.Sockets)),
+		"links":     fmt.Sprintf("%d", i.SocketLinks()),
+		"frametype": i.FrameType.String(),
+	}
 }
 
 type SocketAttr struct {
@@ -154,6 +209,32 @@ func (rv *RequirementsValues) UnmarshalJSON(data []byte) error {
 }
 
 type FrameType int
+
+func (ft FrameType) String() string {
+	switch ft {
+	case 0:
+		return "normal"
+	case 1:
+		return "magic"
+	case 2:
+		return "rare"
+	case 3:
+		return "unique"
+	case 4:
+		return "gem"
+	case 5:
+		return "currency"
+	case 6:
+		return "divination"
+	case 7:
+		return "quest"
+	case 8:
+		return "prophecy"
+	case 9:
+		return "relic"
+	}
+	return "unknown"
+}
 
 const (
 	FrameTypeNormal = iota

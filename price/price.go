@@ -2,6 +2,7 @@ package price
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -9,10 +10,17 @@ import (
 
 var (
 	ErrInvalidCurrencyQuantity = errors.New("unrecognized currency quantity")
-	ErrBadParse                = errors.New("error parsing price")
 	ErrUnrecognizedPriceType   = errors.New("unrecognized price type")
 	ErrUnrecognizedCurrency    = errors.New("unrecognized currency type")
 )
+
+type ErrBadParse struct {
+	raw string
+}
+
+func (ebp ErrBadParse) Error() string {
+	return fmt.Sprintf("unable to parse %s", ebp.raw)
+}
 
 type PriceStatus int
 
@@ -39,7 +47,9 @@ func ParsePrice(s string) (ItemPrice, error) {
 	}
 
 	if len(fields) < 3 {
-		return ip, ErrBadParse
+		var err ErrBadParse
+		err.raw = s
+		return ip, err
 	}
 
 	switch fields[0] {

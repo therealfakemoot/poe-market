@@ -16,14 +16,14 @@ func Test_ParsePrice(t *testing.T) {
 			in       string
 			expected ItemPrice
 		}{
-			{"-price 1 chaos", ItemPrice{Exact, 1.0}},
-			{"-price 1.5 chaos", ItemPrice{Exact, 1.5}},
-			{"-price 1.5 exa", ItemPrice{Exact, 150.0}},
-			{"-price 25 alt", ItemPrice{Exact, 0.25}},
+			{"-price 1 chaos", ItemPrice{Exact, "chaos", 1.0}},
+			{"-price 1.5 chaos", ItemPrice{Exact, "chaos", 1.5}},
+			{"-price 1.5 exa", ItemPrice{Exact, "exa", 150.0}},
+			{"-price 25 alt", ItemPrice{Exact, "alt", 0.25}},
 		}
 
 		for _, tt := range cases {
-			actual, err := ParsePrice(tt.in, db)
+			actual, err := ParsePrice(tt.in)
 			if err != nil {
 				t.Logf("unable to parse price: %s", err)
 				t.Fail()
@@ -40,14 +40,14 @@ func Test_ParsePrice(t *testing.T) {
 			in       string
 			expected ItemPrice
 		}{
-			{"~price 1 chaos", ItemPrice{Negotiable, 1.0}},
-			{"~price 1.5 chaos", ItemPrice{Negotiable, 1.5}},
-			{"~price 1.5 exa", ItemPrice{Negotiable, 150.0}},
-			{"~price 25 alt", ItemPrice{Negotiable, 0.25}},
+			{"-price 1 chaos", ItemPrice{Negotiable, "chaos", 1.0}},
+			{"-price 1.5 chaos", ItemPrice{Negotiable, "chaos", 1.5}},
+			{"-price 1.5 exa", ItemPrice{Negotiable, "exa", 150.0}},
+			{"-price 25 alt", ItemPrice{Negotiable, "alt", 0.25}},
 		}
 
 		for _, tt := range cases {
-			actual, err := ParsePrice(tt.in, db)
+			actual, err := ParsePrice(tt.in)
 			if err != nil {
 				t.Logf("unable to parse price: %s", err)
 				t.Fail()
@@ -64,14 +64,14 @@ func Test_ParsePrice(t *testing.T) {
 			in       string
 			expected ItemPrice
 		}{
-			{"~b/o 1 chaos", ItemPrice{BetterOffer, 1.0}},
-			{"~b/o 1.5 chaos", ItemPrice{BetterOffer, 1.5}},
-			{"~b/o 1.5 exa", ItemPrice{BetterOffer, 150.0}},
-			{"~b/o 25 alt", ItemPrice{BetterOffer, 0.25}},
+			{"-price 1 chaos", ItemPrice{BetterOffer, "chaos", 1.0}},
+			{"-price 1.5 chaos", ItemPrice{BetterOffer, "chaos", 1.5}},
+			{"-price 1.5 exa", ItemPrice{BetterOffer, "exa", 150.0}},
+			{"-price 25 alt", ItemPrice{BetterOffer, "alt", 0.25}},
 		}
 
 		for _, tt := range cases {
-			actual, err := ParsePrice(tt.in, db)
+			actual, err := ParsePrice(tt.in)
 			if err != nil {
 				t.Logf("unable to parse price: %s", err)
 				t.Fail()

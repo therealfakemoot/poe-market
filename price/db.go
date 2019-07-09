@@ -26,3 +26,7 @@ func (db MapPriceDB) Convert(q string, t string) (float64, error) {
 
 	return c * v, nil
 }
+
+type POEWatchDB struct {
+	PriceMap map[string]float64
+}

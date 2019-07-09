@@ -17,6 +17,7 @@ import (
 
 	"github.com/therealfakemoot/pom/metrics"
 	"github.com/therealfakemoot/pom/poe"
+	"github.com/therealfakemoot/pom/price"
 )
 
 func LoadFile(filename string) (poe.Envelope, error) {
@@ -61,15 +62,40 @@ func main() {
 	log.Println("starting stream")
 	go stream.Start(ctx)
 
-	var gs metrics.GaugeSet
-	gs.Gauges = make(map[string]prometheus.Gauge)
+	go func() {
+		log.Fatalf("error on errchan: %s", <-stream.Err)
+	}()
 
 	go func() {
-		for stash := range stream.Stashes {
-			if stash.Public {
-				for _, item := range stash.Items {
-					gs.RegisterItem(item)
+		var gs metrics.GaugeSet
+		gs.GaugeVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: "market",
+			Name:      "price_chaos",
+		},
+			[]string{
+				"name",
+				"sockets",
+				"links",
+				"frametype",
+			})
+		prometheus.MustRegister(gs.GaugeVec)
+
+		gs.Gauges = make(map[poe.GaugeKey]prometheus.Gauge)
+		for item := range stream.Items {
+
+			_, ok := gs.Gauges[item.Key()]
+			if !ok {
+				gs.Add(item)
+			}
+			if item.Note != "" {
+
+				ip, err := price.ParsePrice(item.Note)
+				if err != nil {
+					log.Printf("bad parse: %s", item.Note)
+					continue
 				}
+
+				gs.Gauges[item.Key()].Set(ip.Cost)
 			}
 		}
 	}()

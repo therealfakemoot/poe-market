@@ -22,7 +22,7 @@ func (se StreamError) Error() string {
 func New(l *rate.Limiter) StashStream {
 	var sa StashStream
 	sa.Limiter = l
-	sa.Stashes = make(chan Stash, 5)
+	sa.Items = make(chan Item, 5)
 	sa.Err = make(chan error)
 	return sa
 }
@@ -30,7 +30,7 @@ func New(l *rate.Limiter) StashStream {
 type StashStream struct {
 	Limiter *rate.Limiter
 	NextID  string
-	Stashes chan Stash
+	Items   chan Item
 	Err     chan error
 }
 
@@ -79,7 +79,11 @@ func (sa *StashStream) Start(ctx context.Context) {
 		sa.NextID = e.NextChangeID
 
 		for _, stash := range e.Stashes {
-			sa.Stashes <- stash
+			if stash.Public {
+				for _, item := range stash.Items {
+					sa.Items <- item
+				}
+			}
 		}
 	}
 }

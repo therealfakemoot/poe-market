@@ -20,25 +20,15 @@ func SanitizeName(name string) string {
 	return strings.ToLower(s)
 }
 
-func NewGauge(i poe.Item) prometheus.Gauge {
-	sanitized := SanitizeName(i.TypeLine)
-	return prometheus.NewGauge(prometheus.GaugeOpts{
-		Namespace: "market",
-		Name:      sanitized,
-	})
-}
-
 type GaugeSet struct {
-	Gauges map[string]prometheus.Gauge
+	GaugeVec *prometheus.GaugeVec
+	Gauges   map[poe.GaugeKey]prometheus.Gauge
 }
 
-func (gs GaugeSet) RegisterItem(i poe.Item) {
-
-	if i.Note != "" {
-		_, ok := gs.Gauges[i.TypeLine]
-		if !ok {
-			gs.Gauges[i.TypeLine] = NewGauge(i)
-			prometheus.MustRegister(gs.Gauges[i.TypeLine])
-		}
+func (gs GaugeSet) Add(i poe.Item) {
+	gk := i.Key()
+	_, ok := gs.Gauges[gk]
+	if !ok {
+		gs.Gauges[gk] = gs.GaugeVec.With(i.Labels())
 	}
 }

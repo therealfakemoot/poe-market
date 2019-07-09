@@ -6,6 +6,33 @@ import (
 	"net/url"
 )
 
+var (
+	OrbOfHorizons     = 0
+	Whetstone         = 0
+	JourneymanSextant = 0
+	OrbOfAnnulment    = 0
+	ApprenticeSextant = 0
+	MasterSextant     = 0
+	Mirror            = 0
+	Scour             = 0
+	Silver            = 0
+	Regal             = 0
+	Blessed           = 0
+	Regret            = 0
+	Chance            = 0
+	Divine            = 0
+	Chisel            = 0
+	JewellersOrb      = 0
+	ChromaticOrb      = 0
+	Gcp               = 0
+	Vaal              = 0
+	Fusing            = 0
+	Alteration        = 0
+	Alchemy           = 0
+	Exalted           = 0
+	Chaos             = 0
+)
+
 func PriceCheck() ([]PricePoint, error) {
 	var prices []PricePoint
 
