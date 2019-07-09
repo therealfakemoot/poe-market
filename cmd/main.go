@@ -77,7 +77,8 @@ func main() {
 				"sockets",
 				"links",
 				"frametype",
-			})
+			},
+		)
 		prometheus.MustRegister(gs.GaugeVec)
 
 		gs.Gauges = make(map[poe.GaugeKey]prometheus.Gauge)
