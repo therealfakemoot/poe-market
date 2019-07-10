@@ -1,32 +1,107 @@
 package price
 
 import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
+
+	"github.com/therealfakemoot/pom/poe"
 )
 
-type PriceDB interface {
-	Convert(string, string) (float64, error)
-}
+func NewLiveDB() (LiveDB, error) {
+	var prices []PricePoint
 
-type MapPriceDB struct {
-	priceMap map[string]float64
-}
+	ldb := make(LiveDB)
 
-func (db MapPriceDB) Convert(q string, t string) (float64, error) {
+	queryValues := url.Values{}
+	queryValues.Set("league", "Legion")
+	queryValues.Set("category", "currency")
 
-	c, ok := db.priceMap[t]
-	if !ok {
-		return 0.0, ErrUnrecognizedCurrency
+	PricesEndpoint := url.URL{
+		Host:     "api.poe.watch",
+		Scheme:   "https",
+		Path:     "get",
+		RawQuery: queryValues.Encode(),
 	}
 
-	v, err := strconv.ParseFloat(q, 64)
+	c := http.Client{}
+
+	resp, err := c.Get(PricesEndpoint.String())
 	if err != nil {
-		return 0.0, ErrInvalidCurrencyQuantity
+		return ldb, err
+	}
+	defer resp.Body.Close()
+
+	d := json.NewDecoder(resp.Body)
+	err = d.Decode(&prices)
+	if err != nil {
+		return ldb, err
 	}
 
-	return c * v, nil
+	priceMap := make(map[int]float64)
+
+	for _, pp := range prices {
+		priceMap[pp.ID] = pp.Median
+	}
+
+	log.Printf("priceMap: %#v", priceMap)
+
+	for k, v := range IDMap {
+		ldb[k] = float64(priceMap[v])
+	}
+
+	ldb["chaos"] = 1.0
+	log.Printf("ldb: %#v", ldb)
+	return ldb, nil
 }
 
-type POEWatchDB struct {
-	PriceMap map[string]float64
+type LiveDB map[string]float64
+
+func (ldb LiveDB) Price(item poe.Item) (ItemPrice, error) {
+	var ip ItemPrice
+
+	n := item.Note
+	fields := strings.Fields(n)
+
+	if n == "~price" {
+		ip.PriceStatus = Negotiable
+		return ip, nil
+	}
+
+	if len(fields) < 3 {
+		var err ErrBadParse
+		err.raw = n
+		return ip, err
+	}
+
+	switch fields[0] {
+	case "-price":
+		ip.PriceStatus = Exact
+	case "~price":
+		ip.PriceStatus = Negotiable
+	case "~b/o", "b/o":
+		ip.PriceStatus = BetterOffer
+	default:
+		return ip, ErrUnrecognizedPriceType
+	}
+
+	ip.BaseCurrency = fields[2]
+	marketPrice, ok := ldb[ip.BaseCurrency]
+	if !ok {
+		return ip, ErrUnrecognizedCurrency
+	}
+	itemCost, err := strconv.ParseFloat(fields[1], 64)
+	if err != nil {
+		return ip, err
+	}
+
+	log.Printf("calculating cost for %s with note `%s`", item.Key().Name, n)
+	log.Printf("market price for currency: %.2f", marketPrice)
+	ip.Cost = itemCost * marketPrice
+	log.Printf("final cost: %.2f", ip.Cost)
+
+	return ip, nil
 }

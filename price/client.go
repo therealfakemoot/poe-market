@@ -1,69 +1,5 @@
 package price
 
-import (
-	"encoding/json"
-	"net/http"
-	"net/url"
-)
-
-var (
-	OrbOfHorizons     = 0
-	Whetstone         = 0
-	JourneymanSextant = 0
-	OrbOfAnnulment    = 0
-	ApprenticeSextant = 0
-	MasterSextant     = 0
-	Mirror            = 0
-	Scour             = 0
-	Silver            = 0
-	Regal             = 0
-	Blessed           = 0
-	Regret            = 0
-	Chance            = 0
-	Divine            = 0
-	Chisel            = 0
-	JewellersOrb      = 0
-	ChromaticOrb      = 0
-	Gcp               = 0
-	Vaal              = 0
-	Fusing            = 0
-	Alteration        = 0
-	Alchemy           = 0
-	Exalted           = 0
-	Chaos             = 0
-)
-
-func PriceCheck() ([]PricePoint, error) {
-	var prices []PricePoint
-
-	queryValues := url.Values{}
-	queryValues.Set("league", "Legion")
-	queryValues.Set("category", "currency")
-
-	PricesEndpoint := url.URL{
-		Host:     "api.poe.watch",
-		Scheme:   "https",
-		Path:     "get",
-		RawQuery: queryValues.Encode(),
-	}
-
-	c := http.Client{}
-
-	resp, err := c.Get(PricesEndpoint.String())
-	if err != nil {
-		return prices, err
-	}
-	defer resp.Body.Close()
-
-	d := json.NewDecoder(resp.Body)
-	err = d.Decode(&prices)
-	if err != nil {
-		return prices, err
-	}
-
-	return prices, nil
-}
-
 type PricePoint struct {
 	ID        int       `json:"id"`
 	Name      string    `json:"name"`
@@ -85,4 +21,33 @@ type PricePoint struct {
 	Change    float64   `json:"change"`
 	History   []float64 `json:"history"`
 	Type      string    `json:"type,omitempty"`
+}
+
+var IDMap = map[string]int{
+	"orb-of-horizons":    418,
+	"scr":                1340,
+	"whe":                1339,
+	"journeyman-sextant": 535,
+	"orb-of-annulment":   1343,
+	"apprentice-sextant": 114,
+	"master-sextant":     1007,
+	"mirror":             3282,
+	"scour":              1340,
+	"silver":             721,
+	"regal":              222,
+	"blessed":            801,
+	"regret":             433,
+	"chance":             421,
+	"mir":                5498,
+	"divine":             422,
+	"chisel":             223,
+	"jew":                720,
+	"chrom":              221,
+	"gcp":                113,
+	"vaal":               224,
+	"fuse":               301,
+	"alt":                220,
+	"alch":               225,
+	"exa":                142,
+	"chaos":              0, // omitted because chaos is the base currency
 }

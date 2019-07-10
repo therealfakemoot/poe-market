@@ -66,11 +66,17 @@ func main() {
 		log.Fatalf("error on errchan: %s", <-stream.Err)
 	}()
 
+	pdb, err := price.NewLiveDB()
+	if err != nil {
+		log.Printf("error creating pricedb: %s", err)
+		return
+	}
+
 	go func() {
 		var gs metrics.GaugeSet
 		gs.GaugeVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: "market",
-			Name:      "price_chaos",
+			Name:      "item_price_chaos",
 		},
 			[]string{
 				"name",
@@ -90,9 +96,9 @@ func main() {
 			}
 			if item.Note != "" {
 
-				ip, err := price.ParsePrice(item.Note)
+				ip, err := pdb.Price(item)
 				if err != nil {
-					log.Printf("bad parse: %s", item.Note)
+					// log.Printf("bad parse: %s", item.Note)
 					continue
 				}
 
