@@ -73,8 +73,8 @@ func main() {
 	}
 
 	go func() {
-		var gs metrics.GaugeSet
-		gs.GaugeVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		var gs metrics.HistogramSet
+		gs.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 			Namespace: "market",
 			Name:      "item_price_chaos",
 		},
@@ -85,12 +85,12 @@ func main() {
 				"frametype",
 			},
 		)
-		prometheus.MustRegister(gs.GaugeVec)
+		prometheus.MustRegister(gs.HistogramVec)
 
-		gs.Gauges = make(map[poe.GaugeKey]prometheus.Gauge)
+		gs.Histograms = make(map[poe.HistoKey]prometheus.Observer)
 		for item := range stream.Items {
 
-			_, ok := gs.Gauges[item.Key()]
+			_, ok := gs.Histograms[item.Key()]
 			if !ok {
 				gs.Add(item)
 			}
@@ -102,7 +102,7 @@ func main() {
 					continue
 				}
 
-				gs.Gauges[item.Key()].Set(ip.Cost)
+				gs.Histograms[item.Key()].Observe(ip.Cost)
 			}
 		}
 	}()

@@ -20,15 +20,15 @@ func SanitizeName(name string) string {
 	return strings.ToLower(s)
 }
 
-type GaugeSet struct {
-	GaugeVec *prometheus.GaugeVec
-	Gauges   map[poe.GaugeKey]prometheus.Gauge
+type HistogramSet struct {
+	HistogramVec *prometheus.HistogramVec
+	Histograms   map[poe.HistoKey]prometheus.Observer
 }
 
-func (gs GaugeSet) Add(i poe.Item) {
-	gk := i.Key()
-	_, ok := gs.Gauges[gk]
+func (hs HistogramSet) Add(i poe.Item) {
+	hk := i.Key()
+	_, ok := hs.Histograms[hk]
 	if !ok {
-		gs.Gauges[gk] = gs.GaugeVec.With(i.Labels())
+		hs.Histograms[hk] = hs.HistogramVec.With(i.Labels())
 	}
 }
