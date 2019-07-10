@@ -2,7 +2,6 @@ package price
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -47,14 +46,11 @@ func NewLiveDB() (LiveDB, error) {
 		priceMap[pp.ID] = pp.Median
 	}
 
-	log.Printf("priceMap: %#v", priceMap)
-
 	for k, v := range IDMap {
 		ldb[k] = float64(priceMap[v])
 	}
 
 	ldb["chaos"] = 1.0
-	log.Printf("ldb: %#v", ldb)
 	return ldb, nil
 }
 
@@ -98,10 +94,7 @@ func (ldb LiveDB) Price(item poe.Item) (ItemPrice, error) {
 		return ip, err
 	}
 
-	log.Printf("calculating cost for %s with note `%s`", item.Key().Name, n)
-	log.Printf("market price for currency: %.2f", marketPrice)
 	ip.Cost = itemCost * marketPrice
-	log.Printf("final cost: %.2f", ip.Cost)
 
 	return ip, nil
 }
