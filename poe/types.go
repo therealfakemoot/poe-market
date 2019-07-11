@@ -124,13 +124,19 @@ func (i Item) Labels() prometheus.Labels {
 	if i.Name == "" {
 		name = i.TypeLine
 	}
-
-	return prometheus.Labels{
-		"name":      name,
-		"sockets":   fmt.Sprintf("%d", len(i.Sockets)),
-		"links":     fmt.Sprintf("%d", i.SocketLinks()),
-		"frametype": i.FrameType.String(),
+	switch i.FrameType {
+	case 0, 1, 2, 3:
+		return prometheus.Labels{
+			"name":    name,
+			"sockets": fmt.Sprintf("%d", len(i.Sockets)),
+			"links":   fmt.Sprintf("%d", i.SocketLinks()),
+		}
+	case 4, 5, 6, 7, 8, 9:
+		return prometheus.Labels{
+			"name": name,
+		}
 	}
+	return prometheus.Labels{}
 }
 
 type SocketAttr struct {

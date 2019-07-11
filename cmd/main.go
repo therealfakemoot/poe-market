@@ -73,36 +73,149 @@ func main() {
 	}
 
 	go func() {
-		var gs metrics.HistogramSet
-		gs.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		var (
+			gear     metrics.HistogramSet
+			gems     metrics.HistogramSet
+			currency metrics.HistogramSet
+			div      metrics.HistogramSet
+			quest    metrics.HistogramSet
+			prophecy metrics.HistogramSet
+			relic    metrics.HistogramSet
+		)
+
+		gear.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		gear.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 			Namespace: "market",
-			Name:      "item_price_chaos",
+			Name:      "gear_price_chaos",
 		},
 			[]string{
 				"name",
 				"sockets",
 				"links",
-				"frametype",
 			},
 		)
-		prometheus.MustRegister(gs.HistogramVec)
+		prometheus.MustRegister(gear.HistogramVec)
 
-		gs.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		gems.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		gems.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "gems_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(gems.HistogramVec)
+
+		currency.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		currency.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "currency_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(currency.HistogramVec)
+
+		div.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		div.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "div_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(div.HistogramVec)
+
+		quest.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		quest.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "quest_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(quest.HistogramVec)
+
+		prophecy.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		prophecy.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "prophecy_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(prophecy.HistogramVec)
+
+		relic.Histograms = make(map[poe.HistoKey]prometheus.Observer)
+		relic.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Namespace: "market",
+			Name:      "relic_price_chaos",
+		},
+			[]string{
+				"name",
+			},
+		)
+		prometheus.MustRegister(relic.HistogramVec)
+
 		for item := range stream.Items {
-
-			_, ok := gs.Histograms[item.Key()]
-			if !ok {
-				gs.Add(item)
-			}
 			if item.Note != "" {
-
 				ip, err := pdb.Price(item)
 				if err != nil {
 					// log.Printf("bad parse: %s", item.Note)
 					continue
 				}
 
-				gs.Histograms[item.Key()].Observe(ip.Cost)
+				switch item.FrameType {
+				case 0, 1, 2, 3:
+					_, ok := gear.Histograms[item.Key()]
+					if !ok {
+						gear.Add(item)
+					}
+					gear.Histograms[item.Key()].Observe(ip.Cost)
+				case 4:
+					_, ok := gems.Histograms[item.Key()]
+					if !ok {
+						gems.Add(item)
+					}
+					gems.Histograms[item.Key()].Observe(ip.Cost)
+				case 5:
+					_, ok := currency.Histograms[item.Key()]
+					if !ok {
+						currency.Add(item)
+					}
+					currency.Histograms[item.Key()].Observe(ip.Cost)
+				case 6:
+					_, ok := div.Histograms[item.Key()]
+					if !ok {
+						div.Add(item)
+					}
+					div.Histograms[item.Key()].Observe(ip.Cost)
+				case 7:
+					_, ok := quest.Histograms[item.Key()]
+					if !ok {
+						quest.Add(item)
+					}
+					quest.Histograms[item.Key()].Observe(ip.Cost)
+				case 8:
+					_, ok := prophecy.Histograms[item.Key()]
+					if !ok {
+						prophecy.Add(item)
+					}
+					prophecy.Histograms[item.Key()].Observe(ip.Cost)
+				case 9:
+					_, ok := relic.Histograms[item.Key()]
+					if !ok {
+						relic.Add(item)
+					}
+					relic.Histograms[item.Key()].Observe(ip.Cost)
+
+				}
+
 			}
 		}
 	}()
