@@ -8,7 +8,7 @@ import (
 )
 
 // GaugeKey is used to identify an item in the context of a metrics.GaugeSet. Had to move it here to prevent an import cycle.
-type HistoKey struct {
+type SummaryKey struct {
 	Name      string
 	Sockets   int
 	Links     int
@@ -103,14 +103,14 @@ func (i Item) SocketLinks() int {
 	return max
 }
 
-func (i Item) Key() HistoKey {
+func (i Item) Key() SummaryKey {
 	var name = i.Name
 
 	if i.Name == "" {
 		name = i.TypeLine
 	}
 
-	return HistoKey{
+	return SummaryKey{
 		Name:      name,
 		Sockets:   len(i.Sockets),
 		Links:     i.SocketLinks(),

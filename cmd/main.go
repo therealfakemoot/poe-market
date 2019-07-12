@@ -74,19 +74,24 @@ func main() {
 
 	go func() {
 		var (
-			gear     metrics.HistogramSet
-			gems     metrics.HistogramSet
-			currency metrics.HistogramSet
-			div      metrics.HistogramSet
-			quest    metrics.HistogramSet
-			prophecy metrics.HistogramSet
-			relic    metrics.HistogramSet
+			gear     metrics.SummarySet
+			gems     metrics.SummarySet
+			currency metrics.SummarySet
+			div      metrics.SummarySet
+			quest    metrics.SummarySet
+			prophecy metrics.SummarySet
+			relic    metrics.SummarySet
 		)
 
-		gear.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		gear.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		gear.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		gear.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "gear_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
@@ -94,73 +99,103 @@ func main() {
 				"links",
 			},
 		)
-		prometheus.MustRegister(gear.HistogramVec)
+		prometheus.MustRegister(gear.SummaryVec)
 
-		gems.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		gems.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		gems.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		gems.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "gems_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(gems.HistogramVec)
+		prometheus.MustRegister(gems.SummaryVec)
 
-		currency.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		currency.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		currency.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		currency.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "currency_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(currency.HistogramVec)
+		prometheus.MustRegister(currency.SummaryVec)
 
-		div.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		div.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		div.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		div.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "div_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(div.HistogramVec)
+		prometheus.MustRegister(div.SummaryVec)
 
-		quest.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		quest.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		quest.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		quest.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "quest_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(quest.HistogramVec)
+		prometheus.MustRegister(quest.SummaryVec)
 
-		prophecy.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		prophecy.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		prophecy.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		prophecy.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "prophecy_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(prophecy.HistogramVec)
+		prometheus.MustRegister(prophecy.SummaryVec)
 
-		relic.Histograms = make(map[poe.HistoKey]prometheus.Observer)
-		relic.HistogramVec = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		relic.Summaries = make(map[poe.SummaryKey]prometheus.Observer)
+		relic.SummaryVec = prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: "market",
 			Name:      "relic_price_chaos",
+			Objectives: map[float64]float64{
+				0.5:  0.1,
+				0.9:  0.1,
+				0.99: 0.1,
+			},
 		},
 			[]string{
 				"name",
 			},
 		)
-		prometheus.MustRegister(relic.HistogramVec)
+		prometheus.MustRegister(relic.SummaryVec)
 
 		for item := range stream.Items {
 			if item.Note != "" {
@@ -172,47 +207,47 @@ func main() {
 
 				switch item.FrameType {
 				case 0, 1, 2, 3:
-					_, ok := gear.Histograms[item.Key()]
+					_, ok := gear.Summaries[item.Key()]
 					if !ok {
 						gear.Add(item)
 					}
-					gear.Histograms[item.Key()].Observe(ip.Cost)
+					gear.Summaries[item.Key()].Observe(ip.Cost)
 				case 4:
-					_, ok := gems.Histograms[item.Key()]
+					_, ok := gems.Summaries[item.Key()]
 					if !ok {
 						gems.Add(item)
 					}
-					gems.Histograms[item.Key()].Observe(ip.Cost)
+					gems.Summaries[item.Key()].Observe(ip.Cost)
 				case 5:
-					_, ok := currency.Histograms[item.Key()]
+					_, ok := currency.Summaries[item.Key()]
 					if !ok {
 						currency.Add(item)
 					}
-					currency.Histograms[item.Key()].Observe(ip.Cost)
+					currency.Summaries[item.Key()].Observe(ip.Cost)
 				case 6:
-					_, ok := div.Histograms[item.Key()]
+					_, ok := div.Summaries[item.Key()]
 					if !ok {
 						div.Add(item)
 					}
-					div.Histograms[item.Key()].Observe(ip.Cost)
+					div.Summaries[item.Key()].Observe(ip.Cost)
 				case 7:
-					_, ok := quest.Histograms[item.Key()]
+					_, ok := quest.Summaries[item.Key()]
 					if !ok {
 						quest.Add(item)
 					}
-					quest.Histograms[item.Key()].Observe(ip.Cost)
+					quest.Summaries[item.Key()].Observe(ip.Cost)
 				case 8:
-					_, ok := prophecy.Histograms[item.Key()]
+					_, ok := prophecy.Summaries[item.Key()]
 					if !ok {
 						prophecy.Add(item)
 					}
-					prophecy.Histograms[item.Key()].Observe(ip.Cost)
+					prophecy.Summaries[item.Key()].Observe(ip.Cost)
 				case 9:
-					_, ok := relic.Histograms[item.Key()]
+					_, ok := relic.Summaries[item.Key()]
 					if !ok {
 						relic.Add(item)
 					}
-					relic.Histograms[item.Key()].Observe(ip.Cost)
+					relic.Summaries[item.Key()].Observe(ip.Cost)
 
 				}
 

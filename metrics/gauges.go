@@ -20,15 +20,15 @@ func SanitizeName(name string) string {
 	return strings.ToLower(s)
 }
 
-type HistogramSet struct {
-	HistogramVec *prometheus.HistogramVec
-	Histograms   map[poe.HistoKey]prometheus.Observer
+type SummarySet struct {
+	SummaryVec *prometheus.SummaryVec
+	Summaries  map[poe.SummaryKey]prometheus.Observer
 }
 
-func (hs HistogramSet) Add(i poe.Item) {
+func (hs SummarySet) Add(i poe.Item) {
 	hk := i.Key()
-	_, ok := hs.Histograms[hk]
+	_, ok := hs.Summaries[hk]
 	if !ok {
-		hs.Histograms[hk] = hs.HistogramVec.With(i.Labels())
+		hs.Summaries[hk] = hs.SummaryVec.With(i.Labels())
 	}
 }
