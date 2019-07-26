@@ -16,6 +16,8 @@ services:
       - --web.page-title="Path of Marketing - Raw Metrics"
       - --storage.tsdb.retention.time=12h
     image: prom/prometheus
+    labels:
+      - "traefik.frontend.rule=Host:prometheus.docker.localhost"
     ports:
       - "9091:9090"
   pom:
@@ -23,8 +25,25 @@ services:
       context: .
       dockerfile: Dockerfile
     image: pom:latest
+    labels:
+      - "traefik.frontend.rule=Host:pom.docker.localhost"
     ports:
       - "9092:9092"
+  reverse-proxy:
+    image: traefik
+    configs:
+      - source: traefik
+        target: /etc/traefik/traefik.toml
+    command: --api --configFile=/etc/traefik/traefik.toml --docker --docker.domain=docker.localhost
+    labels:
+      - "traefik.frontend.rule=Host:reverse-proxy.poe-market.docker.localhost"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 configs:
   prometheus:
     file: ./prometheus.yml
+  traefik:
+    file: ./traefik.toml

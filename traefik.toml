@@ -1,0 +1,5 @@
+loglevel = "DEBUG"
+
+[traefikLog]
+  filePath = "traefik.log"
+  format = "common"
