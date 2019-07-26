@@ -48,7 +48,7 @@ func (sa *StashStream) Start(ctx context.Context) {
 	var e Envelope
 
 	for {
-		log.Printf(`requesting page "%s"`, sa.NextID)
+		// log.Printf(`requesting page "%s"`, sa.NextID)
 		v := url.Values{}
 		v.Set("id", sa.NextID)
 		BASE.RawQuery = v.Encode()
@@ -75,7 +75,7 @@ func (sa *StashStream) Start(ctx context.Context) {
 			log.Printf("error decoding envelope: %s", err)
 			continue
 		}
-		log.Printf("next page ID: %s", e.NextChangeID)
+		// log.Printf("next page ID: %s", e.NextChangeID)
 		sa.NextID = e.NextChangeID
 
 		for _, stash := range e.Stashes {
