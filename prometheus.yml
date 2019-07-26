@@ -1,7 +1,4 @@
-# A scrape configuration scraping a Node Exporter and the Prometheus server
-# itself.
 scrape_configs:
-  # Scrape Prometheus itself every 5 seconds.
   - job_name: 'prometheus'
     scrape_interval: 5s
     static_configs:
@@ -12,6 +9,8 @@ scrape_configs:
       - targets: ['reverse-proxy.poe-market.docker.localhost:8080']
   dns_sd_configs:
   - names:
-    - 'tasks.dockerd-exporter'
+    - 'prometheus.docker.localhost'
+    - 'reverse-proxy.poe-market.docker.localhost'
+    - ''
     type: 'A'
     port: 9323

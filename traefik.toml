@@ -3,3 +3,7 @@ loglevel = "DEBUG"
 [traefikLog]
   filePath = "traefik.log"
   format = "common"
+
+[metrics]
+  [metrics.prometheus]
+    buckets = [0.1,0.3,1.5,2.5]
